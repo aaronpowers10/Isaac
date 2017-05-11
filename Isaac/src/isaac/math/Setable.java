@@ -17,7 +17,7 @@
  */
 package isaac.math;
 
-public interface Setable {
+public interface Setable extends Evaluatable {
 	
 	public void set(double value);
 

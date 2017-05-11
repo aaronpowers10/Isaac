@@ -35,7 +35,7 @@ public class LinearMath {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>> Matrix<T> identity(int size) {
+	public static <T extends Evaluatable> Matrix<T> identity(int size) {
 		Matrix<T> mat = new Matrix<T>(size, size);
 		for (int i = 0; i < size; i++) {
 			mat.set(i, i, (T)(new Numeric(1.0)));
@@ -52,7 +52,7 @@ public class LinearMath {
 	 * @return
 	 * @throws ComputationException
 	 */
-	public static <T extends Evaluatable<T>> Matrix<T> augment(Matrix<T> mat1, Matrix<T> mat2) throws ComputationException {
+	public static <T extends Evaluatable> Matrix<T> augment(Matrix<T> mat1, Matrix<T> mat2) throws ComputationException {
 		if (mat1.numRows() != mat2.numRows()) {
 			throw new ComputationException("Attempted matrix augmentation without equal number of rows.");
 		}
@@ -80,7 +80,7 @@ public class LinearMath {
 	 *            An input matrix.
 	 * @return The submatrix defined by the start and end columns.
 	 */
-	public static <T extends Evaluatable<T>> Matrix<T> subMatrix(int startColumn, int endColumn, Matrix<T> mat) {
+	public static <T extends Evaluatable> Matrix<T> subMatrix(int startColumn, int endColumn, Matrix<T> mat) {
 		Matrix<T> sub = new Matrix<T>(mat.numRows(), endColumn - startColumn);
 		int j = 0;
 		for (int i = startColumn; i < endColumn; i++) {
@@ -104,7 +104,7 @@ public class LinearMath {
 	 * @throws ComputationException
 	 */
 
-	public static <T extends Evaluatable<T>> Matrix<T> multiply(Matrix<T> mat1, Matrix<T> mat2) throws ComputationException {
+	public static <T extends Evaluatable> Matrix<T> multiply(Matrix<T> mat1, Matrix<T> mat2) throws ComputationException {
 		if (mat1.numColumns() != mat2.numRows()) {
 			throw new ComputationException("Illegal matrix multiplication: Number of columns in matrix 1 do not match"
 					+ " the number of rows in matrix 2");
@@ -129,7 +129,7 @@ public class LinearMath {
 	 * @throws ComputationException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>, U extends Evaluatable<U>> T dotProduct(Vector<T> vector1, Vector<U> vector2)  {
+	public static <T extends Evaluatable, U extends Evaluatable> T dotProduct(Vector<T> vector1, Vector<U> vector2)  {
 		if (vector1.size() != vector2.size()) {
 			System.out.println(vector1.size() + " " + vector2.size());
 			throw new ComputationException("Illegal vector dot product: Vectors are not of equal size");
@@ -152,7 +152,7 @@ public class LinearMath {
 	 * @return The resulting Matrix of the multiplication.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>> Matrix<T> multiply(Matrix<T> mat, T scalar) {
+	public static <T extends Evaluatable> Matrix<T> multiply(Matrix<T> mat, T scalar) {
 		Matrix<T> result = new Matrix<T>(mat.numRows(), mat.numColumns());
 		for (int i = 0; i < mat.numRows(); i++) {
 			for (int j = 0; j < mat.numColumns(); j++) {
@@ -174,7 +174,7 @@ public class LinearMath {
 	 * @return Resulting vector in array list form.
 	 * @throws ComputationException
 	 */
-	public static <T extends Evaluatable<T>> Vector<T> multiply(Matrix<T> mat, Vector<T> vect){
+	public static <T extends Evaluatable, U extends Evaluatable> Vector<T> multiply(Matrix<T> mat, Vector<U> vect){
 		if (mat.numRows() != vect.size()) {
 			throw new ComputationException(
 					"Illegal matrix-vector multiplication: The number of rows of the matrix should equal"
@@ -187,7 +187,7 @@ public class LinearMath {
 		return result;
 	}
 
-	public static <T extends Evaluatable<T>> Vector<T> multiply(Vector<T> vect, Matrix<T> mat) {
+	public static <T extends Evaluatable> Vector<T> multiply(Vector<T> vect, Matrix<T> mat) {
 		if (mat.numColumns() != vect.size()) {
 			throw new ComputationException(
 					"Illegal matrix-vector multiplication: The number of columns of the matrix should equal"
@@ -208,7 +208,7 @@ public class LinearMath {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static  <T extends Evaluatable<T>> Vector<T> multiply(Vector<T> vect, T scalar) {
+	public static  <T extends Evaluatable> Vector<T> multiply(Vector<T> vect, T scalar) {
 		Vector<T> result = new Vector<T>();
 		for (int i = 0; i < vect.size(); i++) {
 			result.add((T)(new Numeric(scalar.get() * vect.get(i).get())));
@@ -217,7 +217,7 @@ public class LinearMath {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static  <T extends Evaluatable<T>> Vector<T> multiply(Vector<T> vect, double scalar) {
+	public static  <T extends Evaluatable> Vector<T> multiply(Vector<T> vect, double scalar) {
 		Vector<T> result = new Vector<T>();
 		for (int i = 0; i < vect.size(); i++) {
 			result.add( (T)(new Numeric(scalar * vect.get(i).get())));
@@ -233,7 +233,7 @@ public class LinearMath {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>> Vector<T> divide(Vector<T> vect, T scalar) {
+	public static <T extends Evaluatable> Vector<T> divide(Vector<T> vect, T scalar) {
 		Vector<T> result = new Vector<T>();
 		for (int i = 0; i < vect.size(); i++) {
 			result.add( (T)(new Numeric(vect.get(i).get() / scalar.get())));
@@ -253,7 +253,7 @@ public class LinearMath {
 	 * @throws ComputationException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>> Matrix<T> add(Matrix<T> mat1, Matrix<T> mat2) {
+	public static <T extends Evaluatable> Matrix<T> add(Matrix<T> mat1, Matrix<T> mat2) {
 		if ((mat1.numRows() != mat2.numRows() || (mat1.numColumns() != mat2.numColumns()))) {
 			throw new ComputationException("Illegal matrix addition: The two matrices must be of equal size.");
 		}
@@ -278,7 +278,7 @@ public class LinearMath {
 	 * @throws ComputationException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>, U extends Evaluatable<U>> Vector<T> add(Vector<T> vect1, Vector<U> vect2) {
+	public static <T extends Evaluatable, U extends Evaluatable> Vector<T> add(Vector<T> vect1, Vector<U> vect2) {
 		if (vect1.size() != vect2.size()) {
 			throw new ComputationException("Illegal vector addition: The two vectors must be of equal size.");
 		}
@@ -300,7 +300,7 @@ public class LinearMath {
 	 * @throws ComputationException
 	 */
 	@SuppressWarnings("unchecked")
-	public static  <T extends Evaluatable<T>, U extends Evaluatable<U>, V extends Evaluatable<V>> Vector<V> subtract(Vector<T> vect1, Vector<U> vect2) {
+	public static  <T extends Evaluatable, U extends Evaluatable, V extends Evaluatable> Vector<V> subtract(Vector<T> vect1, Vector<U> vect2) {
 		if (vect1.size() != vect2.size()) {
 			throw new ComputationException("Illegal vector subtraction: The two vectors must be of equal size.");
 		}
@@ -312,7 +312,7 @@ public class LinearMath {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>> Vector<T> subtract(Vector<T> vect1, T scalar) {
+	public static <T extends Evaluatable> Vector<T> subtract(Vector<T> vect1, T scalar) {
 
 		Vector<T> result = new Vector<T>();
 		for (int i = 0; i < vect1.size(); i++) {
@@ -330,7 +330,7 @@ public class LinearMath {
 	 * @throws ComputationException
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable<T>> Matrix<T> reducedRowEchelon(Matrix<T> mat){
+	public static <T extends Evaluatable> Matrix<T> reducedRowEchelon(Matrix<T> mat){
 		Matrix<T> result = mat.copy();
 		for (int k = 0; k < mat.numRows(); k++) {
 			double maxPiv = 0;

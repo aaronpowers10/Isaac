@@ -17,13 +17,13 @@
  */
 package isaac.math;
 
-public interface Evaluatable<T extends Evaluatable<T>> {
+public interface Evaluatable {
 	
 	public double get();
 	
-	public T copy();
+	public Evaluatable copy();
 	
-	public default boolean numericallyEquals(T evaluatable){
+	public default boolean numericallyEquals(Evaluatable evaluatable){
 		if(evaluatable.get() == get()){
 			return true;
 		} else {

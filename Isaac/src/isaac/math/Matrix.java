@@ -37,7 +37,7 @@ import java.util.Scanner;
  *
  */
 
-public class Matrix<T extends Evaluatable<T>> {
+public class Matrix<T extends Evaluatable> {
 	/** The values of the matrix in array form. */
 	private ArrayList<Vector<T>> vals;
 
@@ -270,6 +270,7 @@ public class Matrix<T extends Evaluatable<T>> {
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	public double determinant() {
 		if(numRows()!=numColumns()){
 			throw new ComputationException("Cannot compute determinant of non-square matrix.");
@@ -285,7 +286,7 @@ public class Matrix<T extends Evaluatable<T>> {
 					int subColIndex = 0;
 					for (int colIndex = 0; colIndex < numColumns(); colIndex++) {
 						if (colIndex != i){
-							mat.set(rowIndex - 1, subColIndex, get(rowIndex, colIndex).copy());
+							mat.set(rowIndex - 1, subColIndex, (T)get(rowIndex, colIndex).copy());
 							subColIndex++;
 						}
 					}

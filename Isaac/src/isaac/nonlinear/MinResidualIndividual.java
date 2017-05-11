@@ -15,29 +15,37 @@
  *  limitations under the License.
  *
  */
-package isaac.math;
+package isaac.nonlinear;
 
-public class Numeric implements Setable {
+import isaac.math.BoundedNumeric;
+import isaac.math.Evaluatable;
+import isaac.math.Vector;
+
+public class MinResidualIndividual extends Individual{
 	
-	private double value;
+	Vector<BoundedNumeric> x;
+	private  Vector<Evaluatable> residuals;
 	
-	public Numeric(double value){
-		set(value);
+	public MinResidualIndividual(Vector<BoundedNumeric> x, Vector<Evaluatable> residuals){
+		this.x = x;
+		this.residuals = residuals;
 	}
 
 	@Override
-	public void set(double value) {
-		this.value = value;
+	public double fitness() {
+		double max = 0;
+		for(int i=0;i<residuals.size();i++){
+			double residual = residuals.get(i).get();
+			if(residual>max){
+				max = residual;
+			}
+		}
+		return max;
 	}
 
 	@Override
-	public double get() {
-		return value;
-	}
-
-	@Override
-	public Numeric copy() {
-		return new Numeric(value);
+	public Individual copy() {
+		return new MinResidualIndividual(x.copy(),residuals.copy());
 	}
 
 }

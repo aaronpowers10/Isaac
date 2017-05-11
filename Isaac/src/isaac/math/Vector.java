@@ -20,7 +20,7 @@ package isaac.math;
 
 import java.util.ArrayList;
 
-public class Vector<T extends Evaluatable<T>> {
+public class Vector<T extends Evaluatable> {
 
 	private ArrayList<T> vals;
 
@@ -96,10 +96,11 @@ public class Vector<T extends Evaluatable<T>> {
 	/**
 	 * Returns a value clone of the current vector.
 	 */
+	@SuppressWarnings("unchecked")
 	public Vector<T> copy() {
 		Vector<T> cloneVect = new Vector<T>();
 		for (int i = 0; i < size(); i++) {
-			cloneVect.add(get(i).copy());
+			cloneVect.add((T)get(i).copy());
 		}
 		return cloneVect;
 	}
@@ -142,9 +143,10 @@ public class Vector<T extends Evaluatable<T>> {
 	 *            Values of this vector will be used to populate the current
 	 *            vector
 	 */
+	@SuppressWarnings("unchecked")
 	public void setEqual(Vector<T> vect) {
 		for (int i = 0; i < vect.size(); i++) {
-			this.set(i, vect.get(i).copy());
+			this.set(i, (T)vect.get(i).copy());
 		}
 	}
 
@@ -152,6 +154,14 @@ public class Vector<T extends Evaluatable<T>> {
 		double sum = 0;
 		for (int i = 0; i < size(); i++) {
 			sum += (get(i).get() - vect.get(i).get()) * (get(i).get() - vect.get(i).get());
+		}
+		return Math.sqrt(sum);
+	}
+	
+	public double distanceTo(Vector<T> vect,Difference<T> difference){
+		double sum = 0;
+		for(int i=0;i<size();i++){
+			sum += Math.pow((difference.calculate(get(i),vect.get(i))),2);
 		}
 		return Math.sqrt(sum);
 	}

@@ -17,14 +17,47 @@
  */
 package isaac.math;
 
-public interface Bounded extends Setable {
+public class BoundedNumeric implements Bounded{
 	
-	public double min();
+	private double value;
+	private double min;
+	private double max;
 	
-	public double max();
-	
-	public default double range(){
-		return max() - min();
+	public BoundedNumeric(){
+		value = 0.0;
+		min = 0.0;
+		max = 0.0;
+	}
+
+	public BoundedNumeric(double value, double min, double max) {
+		this.value = value;
+		this.min = min;
+		this.max = max;
+	}
+
+	@Override
+	public double min() {
+		return min;
+	}
+
+	@Override
+	public double max() {
+		return max;
+	}
+
+	@Override
+	public void set(double value) {
+		this.value = value;		
+	}
+
+	@Override
+	public double get() {
+		return value;
+	}
+
+	@Override
+	public BoundedNumeric copy() {
+		return new BoundedNumeric(value,min,max);
 	}
 
 }
