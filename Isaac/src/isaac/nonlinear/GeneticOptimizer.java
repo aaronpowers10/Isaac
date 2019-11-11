@@ -7,12 +7,10 @@ import isaac.math.Vector;
 
 public class GeneticOptimizer implements Optimizer{
 
-
-	
 	private Population population;
 	private StoppingCriteria stoppingCriteria;
 
-	public GeneticOptimizer(Population initialPopulation, StoppingCriteria stoppingCriteria, String fileName){
+	public GeneticOptimizer(Population initialPopulation, StoppingCriteria stoppingCriteria){
 		this.stoppingCriteria = stoppingCriteria;
 		this.population = initialPopulation;
 	}
@@ -30,8 +28,5 @@ public class GeneticOptimizer implements Optimizer{
 		while(!stoppingCriteria.isStoppingCriteria()){
 			population.advance();
 		}
-		
 	}
-
-
 }

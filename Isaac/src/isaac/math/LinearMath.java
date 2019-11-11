@@ -1,355 +1,360 @@
-/*
- *
- *  Copyright (C) 2017 Aaron Powers
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+/*     */ package isaac.math;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class LinearMath
+/*     */ {
+/*     */   public static Matrix identity(int size) {
+/*  39 */     Matrix mat = new Matrix(size, size);
+/*  40 */     for (int i = 0; i < size; i++) {
+/*  41 */       mat.set(i, i, new Numeric(1.0D));
+/*     */     }
+/*  43 */     return mat;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Matrix augment(Matrix mat1, Matrix mat2) throws ComputationException {
+/*  56 */     if (mat1.numRows() != mat2.numRows()) {
+/*  57 */       throw new ComputationException("Attempted matrix augmentation without equal number of rows.");
+/*     */     }
+/*  59 */     Matrix augMat = new Matrix(mat1.numRows(), mat1.numColumns() + mat2.numColumns());
+/*  60 */     for (int i = 0; i < augMat.numColumns(); i++) {
+/*  61 */       if (i < mat1.numColumns()) {
+/*  62 */         augMat.setColumn(i, mat1.getColumn(i));
+/*     */       } else {
+/*  64 */         int j = i - mat1.numColumns();
+/*  65 */         augMat.setColumn(i, mat2.getColumn(j));
+/*     */       } 
+/*     */     } 
+/*  68 */     return augMat;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Matrix subMatrix(int startColumn, int endColumn, Matrix mat) {
+/*  84 */     Matrix sub = new Matrix(mat.numRows(), endColumn - startColumn);
+/*  85 */     int j = 0;
+/*  86 */     for (int i = startColumn; i < endColumn; i++) {
+/*  87 */       sub.setColumn(j, mat.getColumn(i));
+/*  88 */       j++;
+/*     */     } 
+/*     */     
+/*  91 */     return sub;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Matrix multiply(Matrix mat1, Matrix mat2) throws ComputationException {
+/* 108 */     if (mat1.numRows() != mat2.numColumns()) {
+/* 109 */       throw new ComputationException("Illegal matrix multiplication: Number of columns in matrix 1 do not match the number of rows in matrix 2");
+/*     */     }
+/*     */     
+/* 112 */     Matrix result = new Matrix(mat1.numRows(), mat2.numColumns());
+/* 113 */     for (int i = 0; i < mat1.numRows(); i++) {
+/* 114 */       for (int j = 0; j < mat2.numColumns(); j++) {
+/* 115 */         result.set(i, j, dotProduct(mat1.getRow(i), mat2.getColumn(j)));
+/*     */       }
+/*     */     } 
+/* 118 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Evaluatable dotProduct(Vector vector1, Vector vector2) {
+/* 133 */     if (vector1.size() != vector2.size()) {
+/* 134 */       throw new ComputationException("Illegal vector dot product: Vectors are not of equal size");
+/*     */     }
+/* 136 */     double result = 0.0D;
+/* 137 */     for (int i = 0; i < vector1.size(); i++) {
+/* 138 */       result += vector1.get(i).get() * vector2.get(i).get();
+/*     */     }
+/* 140 */     return new Numeric(result);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Matrix multiply(Matrix mat, Evaluatable scalar) {
+/* 155 */     Matrix result = new Matrix(mat.numRows(), mat.numColumns());
+/* 156 */     for (int i = 0; i < mat.numRows(); i++) {
+/* 157 */       for (int j = 0; j < mat.numColumns(); j++) {
+/* 158 */         result.set(i, j, new Numeric(scalar.get() * mat.get(i, j).get()));
+/*     */       }
+/*     */     } 
+/* 161 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Vector multiply(Matrix mat, Vector vect) {
+/* 177 */     if (mat.numColumns() != vect.size()) {
+/* 178 */       throw new ComputationException(
+/* 179 */           "Illegal matrix-vector multiplication: The number of rows of the matrix should equalthe size of the vector");
+/*     */     }
+/*     */     
+/* 182 */     Vector result = new Vector();
+/* 183 */     for (int i = 0; i < mat.numRows(); i++) {
+/* 184 */       result.add(dotProduct(mat.getRow(i), vect));
+/*     */     }
+/* 186 */     return result;
+/*     */   }
+/*     */   
+/*     */   public static Vector multiply(Vector vect, Matrix mat) {
+/* 190 */     if (mat.numColumns() != vect.size()) {
+/* 191 */       throw new ComputationException(
+/* 192 */           "Illegal matrix-vector multiplication: The number of columns of the matrix should equalthe size of the vector");
+/*     */     }
+/*     */     
+/* 195 */     Vector result = new Vector();
+/* 196 */     for (int i = 0; i < mat.numColumns(); i++) {
+/* 197 */       result.add(dotProduct(mat.getColumn(i), vect));
+/*     */     }
+/* 199 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Vector multiply(Vector vect, Evaluatable scalar) {
+/* 211 */     Vector result = new Vector();
+/* 212 */     for (int i = 0; i < vect.size(); i++) {
+/* 213 */       result.add(new Numeric(scalar.get() * vect.get(i).get()));
+/*     */     }
+/* 215 */     return result;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public static Vector multiply(Vector vect, double scalar) {
+/* 220 */     Vector result = new Vector();
+/* 221 */     for (int i = 0; i < vect.size(); i++) {
+/* 222 */       result.add(new Numeric(scalar * vect.get(i).get()));
+/*     */     }
+/* 224 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Vector divide(Vector vect, Evaluatable scalar) {
+/* 236 */     Vector result = new Vector();
+/* 237 */     for (int i = 0; i < vect.size(); i++) {
+/* 238 */       result.add(new Numeric(vect.get(i).get() / scalar.get()));
+/*     */     }
+/* 240 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Matrix add(Matrix mat1, Matrix mat2) throws ComputationException {
+/* 256 */     if (mat1.numRows() != mat2.numRows() || mat1.numColumns() != mat2.numColumns()) {
+/* 257 */       throw new ComputationException("Illegal matrix addition: The two matrices must be of equal size.");
+/*     */     }
+/* 259 */     Matrix result = new Matrix(mat1.numRows(), mat1.numColumns());
+/* 260 */     for (int i = 0; i < mat1.numRows(); i++) {
+/* 261 */       for (int j = 0; j < mat1.numColumns(); j++) {
+/* 262 */         result.set(i, j, new Numeric(mat1.get(i, j).get() + mat2.get(i, j).get()));
+/*     */       }
+/*     */     } 
+/*     */     
+/* 266 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Vector add(Vector vect1, Vector vect2) {
+/* 281 */     if (vect1.size() != vect2.size()) {
+/* 282 */       throw new ComputationException("Illegal vector addition: The two vectors must be of equal size.");
+/*     */     }
+/* 284 */     Vector result = new Vector();
+/* 285 */     for (int i = 0; i < vect1.size(); i++) {
+/* 286 */       result.add(new Numeric(vect1.get(i).get() + vect2.get(i).get()));
+/*     */     }
+/* 288 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Vector subtract(Vector vect1, Vector vect2) {
+/* 303 */     if (vect1.size() != vect2.size()) {
+/* 304 */       throw new ComputationException("Illegal vector subtraction: The two vectors must be of equal size.");
+/*     */     }
+/* 306 */     Vector result = new Vector();
+/* 307 */     for (int i = 0; i < vect1.size(); i++) {
+/* 308 */       result.add(new Numeric(vect1.get(i).get() - vect2.get(i).get()));
+/*     */     }
+/* 310 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Vector subtract(Vector vect1, Evaluatable scalar) {
+/* 316 */     Vector result = new Vector();
+/* 317 */     for (int i = 0; i < vect1.size(); i++) {
+/* 318 */       result.add(new Numeric(vect1.get(i).get() - scalar.get()));
+/*     */     }
+/* 320 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static Matrix reducedRowEchelon(Matrix mat) {
+/* 333 */     Matrix result = mat.copy();
+/* 334 */     for (int k = 0; k < mat.numRows(); k++) {
+/* 335 */       double maxPiv = 0.0D;
+/* 336 */       int pivIndex = k;
+/* 337 */       for (int i = k; i < mat.numRows(); i++) {
+/* 338 */         if (Math.abs(result.get(i, k).get()) > maxPiv) {
+/* 339 */           maxPiv = Math.abs(result.get(i, k).get());
+/* 340 */           pivIndex = i;
+/*     */         } 
+/*     */       } 
+/* 343 */       result.swap(k, pivIndex);
+/*     */       
+/* 345 */       result.setRow(k, divide(result.getRow(k), result.getRow(k).get(k)));
+/* 346 */       for (int i = 0; i < mat.numRows(); i++) {
+/* 347 */         if (i != k) {
+/* 348 */           result.addRowTo(k, i, new Numeric(-result.get(i, k).get()));
+/*     */         }
+/*     */       } 
+/*     */     } 
+/* 352 */     return result;
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\JCI_AP\002_Tools\EPC Shade\EPC Shade_001.jar!\isaac\math\LinearMath.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.0.2
  */
-
-package isaac.math;
-
-import static java.lang.Math.abs;
-
-/**
- * This class contains static methods relating to linear algebra.
- *
- * @author Aaron Powers
- *
- */
-public class LinearMath {
-
-	/**
-	 * Creates the identity matrix with the given size.
-	 *
-	 * @param size
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable> Matrix<T> identity(int size) {
-		Matrix<T> mat = new Matrix<T>(size, size);
-		for (int i = 0; i < size; i++) {
-			mat.set(i, i, (T)(new Numeric(1.0)));
-		}
-		return mat;
-	}
-
-	/**
-	 * Returns the augmented matrix created by combining the two matrices side
-	 * by side.
-	 *
-	 * @param mat1
-	 * @param mat2
-	 * @return
-	 * @throws ComputationException
-	 */
-	public static <T extends Evaluatable> Matrix<T> augment(Matrix<T> mat1, Matrix<T> mat2) throws ComputationException {
-		if (mat1.numRows() != mat2.numRows()) {
-			throw new ComputationException("Attempted matrix augmentation without equal number of rows.");
-		}
-		Matrix<T> augMat = new Matrix<T>(mat1.numRows(), mat1.numColumns() + mat2.numColumns());
-		for (int i = 0; i < augMat.numColumns(); i++) {
-			if (i < mat1.numColumns()) {
-				augMat.setColumn(i, mat1.getColumn(i));
-			} else {
-				int j = i - mat1.numColumns();
-				augMat.setColumn(i, mat2.getColumn(j));
-			}
-		}
-		return augMat;
-	}
-
-	/**
-	 * Returns the submatrix which contains all rows of the original matrix and
-	 * columns from startColumn to endColumn.
-	 *
-	 * @param startColumn
-	 *            The index of the column to start the submatrix.
-	 * @param endColumn
-	 *            The index of the column to terminate the submatrix.
-	 * @param mat
-	 *            An input matrix.
-	 * @return The submatrix defined by the start and end columns.
-	 */
-	public static <T extends Evaluatable> Matrix<T> subMatrix(int startColumn, int endColumn, Matrix<T> mat) {
-		Matrix<T> sub = new Matrix<T>(mat.numRows(), endColumn - startColumn);
-		int j = 0;
-		for (int i = startColumn; i < endColumn; i++) {
-			sub.setColumn(j, mat.getColumn(i));
-			j++;
-		}
-
-		return sub;
-	}
-
-	/**
-	 *
-	 * Performs matrix multiplication and returns a new matrix as result.
-	 *
-	 *
-	 * @param mat1
-	 *            First matrix in multiplication.
-	 * @param mat2
-	 *            Second matrix in multiplication
-	 * @return Result of multiplication as Matrix.
-	 * @throws ComputationException
-	 */
-
-	public static <T extends Evaluatable> Matrix<T> multiply(Matrix<T> mat1, Matrix<T> mat2) throws ComputationException {
-		if (mat1.numColumns() != mat2.numRows()) {
-			throw new ComputationException("Illegal matrix multiplication: Number of columns in matrix 1 do not match"
-					+ " the number of rows in matrix 2");
-		}
-		Matrix<T> result = new Matrix<T>(mat1.numColumns(), mat2.numRows());
-		for (int i = 0; i < mat1.numRows(); i++) {
-			for (int j = 0; j < mat2.numColumns(); j++) {
-				result.set(i, j, dotProduct(mat1.getRow(i), mat2.getColumn(j)));
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Performs a dot product between two vector objects.
-	 *
-	 * @param vector1
-	 *            First vector in dot product.
-	 * @param vector2
-	 *            Second vector in dot product.
-	 * @return Result of dot product.
-	 * @throws ComputationException
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable, U extends Evaluatable> T dotProduct(Vector<T> vector1, Vector<U> vector2)  {
-		if (vector1.size() != vector2.size()) {
-			System.out.println(vector1.size() + " " + vector2.size());
-			throw new ComputationException("Illegal vector dot product: Vectors are not of equal size");
-		}
-		double result = 0;
-		for (int i = 0; i < vector1.size(); i++) {
-			result = result + vector1.get(i).get() * vector2.get(i).get();
-		}
-		return (T)(new Numeric(result));
-	}
-
-	/**
-	 * Performs the multiplication of a matrix by a scaler. The resulting matrix
-	 * will have dimensions equal to the input matrix.
-	 *
-	 * @param mat
-	 *            Matrix in multiplication.
-	 * @param scalar
-	 *            Scalar in multiplication.
-	 * @return The resulting Matrix of the multiplication.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable> Matrix<T> multiply(Matrix<T> mat, T scalar) {
-		Matrix<T> result = new Matrix<T>(mat.numRows(), mat.numColumns());
-		for (int i = 0; i < mat.numRows(); i++) {
-			for (int j = 0; j < mat.numColumns(); j++) {
-				result.set(i, j, (T)(new Numeric(scalar.get() * mat.get(i, j).get())));
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Performs the multiplication of a matrix and a vector which results in a
-	 * vector of size equal to the number of columns of the input matrix.
-	 *
-	 *
-	 * @param mat
-	 *            Matrix in multiplication.
-	 * @param vect
-	 *            Vector in multiplication
-	 * @return Resulting vector in array list form.
-	 * @throws ComputationException
-	 */
-	public static <T extends Evaluatable, U extends Evaluatable> Vector<T> multiply(Matrix<T> mat, Vector<U> vect){
-		if (mat.numRows() != vect.size()) {
-			throw new ComputationException(
-					"Illegal matrix-vector multiplication: The number of rows of the matrix should equal"
-							+ "the size of the vector");
-		}
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < mat.numRows(); i++) {
-			result.add (dotProduct(mat.getRow(i), vect));
-		}
-		return result;
-	}
-
-	public static <T extends Evaluatable> Vector<T> multiply(Vector<T> vect, Matrix<T> mat) {
-		if (mat.numColumns() != vect.size()) {
-			throw new ComputationException(
-					"Illegal matrix-vector multiplication: The number of columns of the matrix should equal"
-							+ "the size of the vector");
-		}
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < mat.numColumns(); i++) {
-			result.add((dotProduct(mat.getColumn(i), vect)));
-		}
-		return result;
-	}
-
-	/**
-	 * Performs multiplication of a vector by a scalar.
-	 *
-	 * @param vect
-	 * @param scalar
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static  <T extends Evaluatable> Vector<T> multiply(Vector<T> vect, T scalar) {
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < vect.size(); i++) {
-			result.add((T)(new Numeric(scalar.get() * vect.get(i).get())));
-		}
-		return result;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static  <T extends Evaluatable> Vector<T> multiply(Vector<T> vect, double scalar) {
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < vect.size(); i++) {
-			result.add( (T)(new Numeric(scalar * vect.get(i).get())));
-		}
-		return result;
-	}
-
-	/**
-	 * Performs division of a vector by a scalar.
-	 *
-	 * @param vect
-	 * @param scalar
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable> Vector<T> divide(Vector<T> vect, T scalar) {
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < vect.size(); i++) {
-			result.add( (T)(new Numeric(vect.get(i).get() / scalar.get())));
-		}
-		return result;
-	}
-
-	/**
-	 * Performs the addition of two matrices. Simply adds each item of the same
-	 * index.
-	 *
-	 * @param mat1
-	 *            The first matrix in addition.
-	 * @param mat2
-	 *            The second matrix in addition.
-	 * @return The result of the addition.
-	 * @throws ComputationException
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable> Matrix<T> add(Matrix<T> mat1, Matrix<T> mat2) {
-		if ((mat1.numRows() != mat2.numRows() || (mat1.numColumns() != mat2.numColumns()))) {
-			throw new ComputationException("Illegal matrix addition: The two matrices must be of equal size.");
-		}
-		Matrix<T> result = new Matrix<T>(mat1.numRows(), mat1.numColumns());
-		for (int i = 0; i < mat1.numRows(); i++) {
-			for (int j = 0; j < mat1.numColumns(); j++) {
-				result.set(i, j, (T)(new Numeric(mat1.get(i, j).get() + mat2.get(i, j).get())));
-			}
-
-		}
-		return result;
-	}
-
-	/**
-	 * Performs the addition of two vector objects.
-	 *
-	 * @param vect1
-	 *            The first vector in the addition.
-	 * @param vect2
-	 *            The second vector in the addition.
-	 * @return The result of the addition.
-	 * @throws ComputationException
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable, U extends Evaluatable> Vector<T> add(Vector<T> vect1, Vector<U> vect2) {
-		if (vect1.size() != vect2.size()) {
-			throw new ComputationException("Illegal vector addition: The two vectors must be of equal size.");
-		}
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < vect1.size(); i++) {
-			result.add((T)(new Numeric(vect1.get(i).get() + vect2.get(i).get())));
-		}
-		return result;
-	}
-
-	/**
-	 * Performs the subtraction. of two vector objects.
-	 *
-	 * @param vect1
-	 *            The first vector in the subtraction.
-	 * @param vect2
-	 *            The second vector in the subtraction.
-	 * @return The result of the subtraction.
-	 * @throws ComputationException
-	 */
-	@SuppressWarnings("unchecked")
-	public static  <T extends Evaluatable, U extends Evaluatable, V extends Evaluatable> Vector<V> subtract(Vector<T> vect1, Vector<U> vect2) {
-		if (vect1.size() != vect2.size()) {
-			throw new ComputationException("Illegal vector subtraction: The two vectors must be of equal size.");
-		}
-		Vector<V> result = new Vector<V>();
-		for (int i = 0; i < vect1.size(); i++) {
-			result.add( (V)(new Numeric(vect1.get(i).get() - vect2.get(i).get())));
-		}
-		return result;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable> Vector<T> subtract(Vector<T> vect1, T scalar) {
-
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < vect1.size(); i++) {
-			result.add( (T)(new Numeric(vect1.get(i).get() - scalar.get())));
-		}
-		return result;
-	}
-
-	/**
-	 * Returns the reduced row echelon form of the input matrix using the
-	 * Gauss-Jordan algorithm with pivoting.
-	 *
-	 * @param mat
-	 * @return
-	 * @throws ComputationException
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T extends Evaluatable> Matrix<T> reducedRowEchelon(Matrix<T> mat){
-		Matrix<T> result = mat.copy();
-		for (int k = 0; k < mat.numRows(); k++) {
-			double maxPiv = 0;
-			int pivIndex = k;
-			for (int i = k; i < mat.numRows(); i++) {
-				if (abs(result.get(i, k).get()) > maxPiv) {
-					maxPiv = abs(result.get(i, k).get());
-					pivIndex = i;
-				}
-			}
-			result.swap(k, pivIndex);
-
-			result.setRow(k, divide(result.getRow(k), result.getRow(k).get(k)));
-			for (int i = 0; i < mat.numRows(); i++) {
-				if (i != k) {
-					result.addRowTo(k, i, (T)(new Numeric(-result.get(i, k).get())));
-				}
-			}
-		}
-		return result;
-	}
-}

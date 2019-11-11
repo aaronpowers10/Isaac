@@ -11,7 +11,7 @@ public class NSGACreator implements IndividualsCreator {
 	private double eta2;
 	private double mutationProbability;
 
-	public NSGACreator(int timesToRun, Selector selector, String fileName, double eta1, double eta2, double mutationProbability) {
+	public NSGACreator(int timesToRun, Selector selector, double eta1, double eta2, double mutationProbability) {
 		this.timesToRun = timesToRun;
 		this.selector = selector;
 		this.mutationProbability = mutationProbability;

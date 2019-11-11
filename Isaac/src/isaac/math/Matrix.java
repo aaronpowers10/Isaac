@@ -1,325 +1,352 @@
-/*
- *
- *  Copyright (C) 2017 Aaron Powers
- *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
+/*     */ package isaac.math;
+/*     */ 
+/*     */ import java.io.File;
+/*     */ import java.io.FileNotFoundException;
+/*     */ import java.util.ArrayList;
+/*     */ import java.util.Scanner;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class Matrix
+/*     */ {
+/*     */   private ArrayList<Vector> vals;
+/*     */   
+/*  53 */   public Matrix(int numRows, int numColumns) { setSize(numRows, numColumns); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setSize(int numRows, int numColumns) {
+/*  63 */     this.vals = new ArrayList();
+/*  64 */     for (int i = 0; i < numRows; i++) {
+/*  65 */       Vector vect = new Vector(numColumns);
+/*  66 */       this.vals.add(vect);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  76 */   public int numRows() { return this.vals.size(); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  85 */   public int numColumns() { return ((Vector)this.vals.get(0)).size(); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  95 */   public void set(int rowIndex, int colIndex, Evaluatable value) { ((Vector)this.vals.get(rowIndex)).set(colIndex, value); }
+/*     */ 
+/*     */ 
+/*     */   
+/*  99 */   public void set(int rowIndex, int colIndex, double value) { ((Vector)this.vals.get(rowIndex)).set(colIndex, new Numeric(value)); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 109 */   public Evaluatable get(int rowIndex, int colIndex) { return ((Vector)this.vals.get(rowIndex)).get(colIndex); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Vector getColumn(int index) {
+/* 119 */     Vector result = new Vector();
+/* 120 */     for (int i = 0; i < numRows(); i++) {
+/* 121 */       result.add(get(i, index));
+/*     */     }
+/* 123 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 133 */   public Vector getRow(int index) { return ((Vector)this.vals.get(index)).copy(); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setColumn(int index, Vector vector) {
+/* 143 */     for (int i = 0; i < numRows(); i++) {
+/* 144 */       set(i, index, vector.get(i));
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 155 */   public void setRow(int index, Vector vector) { this.vals.set(index, vector); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void swap(int i, int j) {
+/* 165 */     Vector tempRow = getRow(i);
+/* 166 */     setRow(i, getRow(j));
+/* 167 */     setRow(j, tempRow);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 177 */   public void multiplyRow(int i, Evaluatable scalar) { setRow(i, LinearMath.multiply(getRow(i), scalar)); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 189 */   public void addRowTo(int i, int j, Evaluatable scalar) { setRow(j, LinearMath.add(LinearMath.multiply(getRow(i), scalar), getRow(j))); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Matrix transpose() {
+/* 198 */     Matrix transMatrix = new Matrix(numColumns(), numRows());
+/* 199 */     for (int i = 0; i < numColumns(); i++) {
+/* 200 */       for (int j = 0; j < numRows(); j++) {
+/* 201 */         transMatrix.set(i, j, get(j, i));
+/*     */       }
+/*     */     } 
+/* 204 */     return transMatrix;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Matrix inverse() {
+/* 213 */     Matrix reduced = LinearMath.reducedRowEchelon(LinearMath.augment(this, LinearMath.identity(numRows())));
+/* 214 */     Matrix id = LinearMath.subMatrix(0, numColumns(), reduced);
+/* 215 */     Matrix inv = LinearMath.subMatrix(numColumns(), reduced.numColumns(), reduced);
+/*     */     
+/* 217 */     if (id.numericallyEquals(LinearMath.identity(numRows()))) {
+/* 218 */       return inv;
+/*     */     }
+/* 220 */     System.out.println(write());
+/* 221 */     throw new ComputationException("Matrix inverse error: Singular Matrix");
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public Matrix copy() {
+/* 229 */     Matrix cloneMat = new Matrix(numRows(), numColumns());
+/* 230 */     for (int i = 0; i < numRows(); i++) {
+/* 231 */       cloneMat.setRow(i, getRow(i));
+/*     */     }
+/* 233 */     return cloneMat;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public String write() {
+/* 240 */     String result = "";
+/* 241 */     for (int i = 0; i < numRows(); i++) {
+/* 242 */       result = String.valueOf(result) + getRow(i).write() + "\n";
+/*     */     }
+/* 244 */     return result;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public Vector toVector() {
+/* 249 */     if (numRows() == 1)
+/* 250 */       return getRow(0); 
+/* 251 */     if (numColumns() == 1) {
+/* 252 */       return getColumn(0);
+/*     */     }
+/* 254 */     return null;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean numericallyEquals(Matrix mat) {
+/* 266 */     if (mat.numRows() != numRows()) {
+/* 267 */       return false;
+/*     */     }
+/* 269 */     for (int i = 0; i < numRows(); i++) {
+/* 270 */       if (!mat.getRow(i).numericallyEquals(getRow(i))) {
+/* 271 */         return false;
+/*     */       }
+/*     */     } 
+/*     */     
+/* 275 */     return true;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public double determinant() {
+/* 280 */     if (numRows() != numColumns()) {
+/* 281 */       throw new ComputationException("Cannot compute determinant of non-square matrix.");
+/*     */     }
+/*     */     
+/* 284 */     double result = 0.0D;
+/* 285 */     if (numRows() == 1) {
+/* 286 */       result = get(0, 0).get();
+/*     */     } else {
+/* 288 */       for (int i = 0; i < numRows(); i++) {
+/* 289 */         Matrix mat = new Matrix(numRows() - 1, numColumns() - 1);
+/* 290 */         for (int rowIndex = 1; rowIndex < numRows(); rowIndex++) {
+/* 291 */           int subColIndex = 0;
+/* 292 */           for (int colIndex = 0; colIndex < numColumns(); colIndex++) {
+/* 293 */             if (colIndex != i) {
+/* 294 */               mat.set(rowIndex - 1, subColIndex, get(rowIndex, colIndex).copy());
+/* 295 */               subColIndex++;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/* 299 */         result += Math.pow(-1.0D, i) * get(0, i).get() * mat.determinant();
+/*     */       } 
+/*     */     } 
+/* 302 */     return result;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setEqual(Matrix matrix) {
+/* 312 */     for (int i = 0; i < matrix.numRows(); i++) {
+/* 313 */       ((Vector)this.vals.get(i)).setEqual(matrix.getRow(i));
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public static void main(String[] args) {
+/* 323 */     Matrix matrix = new Matrix(4, 4);
+/*     */     try {
+/* 325 */       Scanner in = new Scanner(new File("C:\\aaron\\Matrix1.txt"));
+/* 326 */       int rowIndex = 0;
+/* 327 */       while (in.hasNextLine()) {
+/* 328 */         String line = in.nextLine();
+/* 329 */         Scanner in2 = new Scanner(line);
+/* 330 */         int columnIndex = 0;
+/* 331 */         while (in2.hasNextDouble()) {
+/* 332 */           matrix.set(rowIndex, columnIndex, new Numeric(in2.nextDouble()));
+/* 333 */           columnIndex++;
+/*     */         } 
+/* 335 */         rowIndex++;
+/* 336 */         in2.close();
+/*     */       } 
+/* 338 */       in.close();
+/* 339 */     } catch (FileNotFoundException e) {
+/*     */       
+/* 341 */       e.printStackTrace();
+/*     */     } 
+/*     */     
+/* 344 */     System.out.println(matrix.determinant());
+/*     */   }
+/*     */ }
+
+
+/* Location:              C:\JCI_AP\002_Tools\EPC Shade\EPC Shade_001.jar!\isaac\math\Matrix.class
+ * Java compiler version: 8 (52.0)
+ * JD-Core Version:       1.0.2
  */
-
-package isaac.math;
-
-import static isaac.math.LinearMath.add;
-import static isaac.math.LinearMath.augment;
-import static isaac.math.LinearMath.identity;
-import static isaac.math.LinearMath.multiply;
-import static isaac.math.LinearMath.reducedRowEchelon;
-import static isaac.math.LinearMath.subMatrix;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
-
-/**
- * The Matrix class represents a 2D matrix of numerical values.
- *
- * @author Aaron Powers
- *
- */
-
-public class Matrix<T extends Evaluatable> {
-	/** The values of the matrix in array form. */
-	private ArrayList<Vector<T>> vals;
-
-	/**
-	 * Constructs matrix of given rows and columns with all zero elements.
-	 *
-	 * @param numRows
-	 *            The number of rows.
-	 * @param numColumns
-	 *            The number of columns.
-	 */
-	public Matrix(int numRows, int numColumns) {
-		setSize(numRows, numColumns);
-	}
-
-	/**
-	 * Sets the size of the matrix and initializes all elements to zero.
-	 * 
-	 * @param numRows
-	 * @param numColumns
-	 */
-	public void setSize(int numRows, int numColumns) {
-		vals = new ArrayList<Vector<T>>();
-		for (int i = 0; i < numRows; i++) {
-			Vector<T> vect = new Vector<T>(numColumns);
-			vals.add(vect);
-		}
-	}
-
-	/**
-	 * Returns the number of rows in the matrix.
-	 * 
-	 * @return
-	 */
-	public int numRows() {
-		return vals.size();
-	}
-
-	/**
-	 * Returns the number of columns in the matrix.
-	 * 
-	 * @return
-	 */
-	public int numColumns() {
-		return vals.get(0).size();
-	}
-
-	/**
-	 *
-	 * @param rowIndex
-	 * @param colIndex
-	 * @param value
-	 */
-	public void set(int rowIndex, int colIndex, T value) {
-		vals.get(rowIndex).set(colIndex, value);
-	}
-
-	/**
-	 *
-	 * @param rowIndex
-	 * @param colIndex
-	 * @return
-	 */
-	public T get(int rowIndex, int colIndex) {
-		return vals.get(rowIndex).get(colIndex);
-	}
-
-	/**
-	 * Returns a clone of the column at the given index.
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public Vector<T> getColumn(int index) {
-		Vector<T> result = new Vector<T>();
-		for (int i = 0; i < numRows(); i++) {
-			result.add(get(i, index));
-		}
-		return result;
-	}
-
-	/**
-	 * Returns a clone of the row at the given index.
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public Vector<T> getRow(int index) {
-		return vals.get(index).copy();
-	}
-
-	/**
-	 * Sets the column at the given index equal to a clone of the input vector.
-	 * 
-	 * @param index
-	 * @param vector
-	 */
-	public void setColumn(int index, Vector<T> vector) {
-		for (int i = 0; i < numRows(); i++) {
-			set(i, index, vector.get(i));
-		}
-	}
-
-	/**
-	 * Sets the row at the given index equal to the input vector.
-	 * 
-	 * @param index
-	 * @param vector
-	 */
-	public void setRow(int index, Vector<T> vector) {
-		vals.set(index, vector);
-	}
-
-	/**
-	 * Swaps the values of rows i and j.
-	 * 
-	 * @param i
-	 * @param j
-	 */
-	public void swap(int i, int j) {
-		Vector<T> tempRow = getRow(i);
-		setRow(i, getRow(j));
-		setRow(j, tempRow);
-	}
-
-	/**
-	 * Multiplies row i by a scalar
-	 * 
-	 * @param i
-	 * @param scalar
-	 */
-	public void multiplyRow(int i, T scalar) {
-		setRow(i, multiply(getRow(i), scalar));
-	}
-
-	/**
-	 * Adds a scalar multiply of row i to row j
-	 * 
-	 * @param i
-	 * @param j
-	 * @param scalar
-	 */
-	public void addRowTo(int i, int j, T scalar) {
-
-		setRow(j, add(multiply(getRow(i), scalar), getRow(j)));
-	}
-
-	/**
-	 * Returns the transpose of the current matrix.
-	 *
-	 * @return
-	 */
-	public Matrix<T> transpose() {
-		Matrix<T> transMatrix = new Matrix<T>(numColumns(), numRows());
-		for (int i = 0; i < numColumns(); i++) {
-			for (int j = 0; j < numRows(); j++) {
-				transMatrix.set(i, j, get(j, i));
-			}
-		}
-		return transMatrix;
-	}
-
-	/**
-	 * Returns the inverse of the current matrix.
-	 *
-	 * @return
-	 */
-	public Matrix<T> inverse() throws ComputationException {
-		Matrix<T> reduced = reducedRowEchelon(augment(this, identity(numRows())));
-		Matrix<T> id = subMatrix(0, numColumns(), reduced);
-		Matrix<T> inv = subMatrix(numColumns(), reduced.numColumns(), reduced);
-
-		if (id.numericallyEquals(identity(numRows()))) {
-			return inv;
-		} else {
-			throw new ComputationException("Matrix inverse error: Singular Matrix");
-		}
-	}
-
-	/**
-	 * Creates a value clone of the current matrix.
-	 */
-	public Matrix<T> copy() {
-		Matrix<T> cloneMat = new Matrix<T>(numRows(), numColumns());
-		for (int i = 0; i < numRows(); i++) {
-			cloneMat.setRow(i, getRow(i));
-		}
-		return cloneMat;
-	}
-
-	/**
-	 * Returns string of matrix values.
-	 */
-	public String write() {
-		String result = "";
-		for (int i = 0; i < numRows(); i++) {
-			result = result + getRow(i).write() + "\n";
-		}
-		return result;
-	}
-
-	public Vector<T> toVector() {
-
-		if (numRows() == 1) {
-			return getRow(0);
-		} else if (numColumns() == 1) {
-			return getColumn(0);
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Tests if the current matrix is value equivalent to the input matrix.
-	 * 
-	 * @param mat
-	 *            The other matrix to compare.
-	 * @return True if the two matrices are value equivalent.
-	 */
-	public boolean numericallyEquals(Matrix<T> mat) {
-		if (mat.numRows() != this.numRows()) {
-			return false;
-		} else {
-			for (int i = 0; i < numRows(); i++) {
-				if (!mat.getRow(i).numericallyEquals(this.getRow(i))) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	@SuppressWarnings("unchecked")
-	public double determinant() {
-		if(numRows()!=numColumns()){
-			throw new ComputationException("Cannot compute determinant of non-square matrix.");
-		}
-		
-		double result = 0;
-		if (numRows() == 1) {
-			result = get(0, 0).get();
-		} else {
-			for (int i = 0; i < numRows(); i++) {
-				Matrix<T> mat = new Matrix<T>(numRows() - 1, numColumns() - 1);
-				for (int rowIndex = 1; rowIndex < numRows(); rowIndex++) {
-					int subColIndex = 0;
-					for (int colIndex = 0; colIndex < numColumns(); colIndex++) {
-						if (colIndex != i){
-							mat.set(rowIndex - 1, subColIndex, (T)get(rowIndex, colIndex).copy());
-							subColIndex++;
-						}
-					}
-				}
-				result += Math.pow(-1, i ) * get(0, i).get() * mat.determinant();
-			}
-		}
-		return result;
-	}
-	
-	public static void main(String[] args){
-		Matrix<Numeric> matrix = new Matrix<Numeric>(4,4);
-		try {
-			Scanner in = new Scanner(new File("C:\\aaron\\Matrix1.txt"));
-			int rowIndex = 0;
-			while(in.hasNextLine()){
-				String line = in.nextLine();
-				Scanner in2 = new Scanner(line);
-				int columnIndex = 0;
-				while(in2.hasNextDouble()){
-					matrix.set(rowIndex, columnIndex, new Numeric(in2.nextDouble()));
-					columnIndex++;
-				}
-				rowIndex++;
-				in2.close();
-			}
-			in.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		System.out.println(matrix.determinant());
-	}
-
-}
